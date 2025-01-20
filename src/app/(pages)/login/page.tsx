@@ -1,10 +1,11 @@
 "use client";
 import { login } from "@/api/auth";
 import Link from "next/link";
+import { useActionState } from "react";
 import { useFormState, useFormStatus } from "react-dom";
 
 export default function LoginForm() {
-  const [state, action] = useFormState(login, undefined);
+  const [state, action] = useActionState(login, undefined);
 
   return (
     <form action={action}>

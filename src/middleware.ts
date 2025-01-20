@@ -10,7 +10,7 @@ export async function middleware(request: NextRequest) {
   const session = await decrypt(cookie);
 
   if (!session) {
-    // return NextResponse.redirect(new URL("/login", request.url));
+    return NextResponse.redirect(new URL("/login", request.url));
   }
   // If authorized, continue the request
   return NextResponse.next();

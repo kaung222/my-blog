@@ -10,7 +10,13 @@ export type FormState =
     }
   | undefined;
 
-export const UserSchema = z.object({
+export const CreateCategorySchema = z.object({
+  name: z.string().min(1, "Name is required."),
+  description: z.string().optional(),
+});
+
+export const UpdateCategorySchema = z.object({
+  id: z.number(),
   name: z.string().min(1, "Name is required."),
   description: z.string().optional(),
 });

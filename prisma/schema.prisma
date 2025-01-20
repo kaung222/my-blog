@@ -9,7 +9,7 @@ generator client {
 }
 
 datasource db {
-  provider = "mysql"
+  provider = "postgres"
   url      = env("DATABASE_URL")
 }
 
@@ -44,7 +44,7 @@ model User {
   email    String   @unique
   name     String
   password String
-  posts    Post[] 
+  posts    Post[]
 }
 
 model Category {
