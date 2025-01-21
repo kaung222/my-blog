@@ -1,4 +1,3 @@
-import { deleteUser } from "@/api/user";
 import DeleteUser from "@/components/delete-user";
 import prisma from "@/lib/prisma";
 import Link from "next/link";

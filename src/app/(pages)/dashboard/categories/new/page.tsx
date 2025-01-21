@@ -4,7 +4,7 @@ import { createCategory } from "@/api/category";
 import Link from "next/link";
 import React, { useActionState } from "react";
 
-const page = () => {
+const Page = () => {
   const [state, action] = useActionState(createCategory, undefined);
   return (
     <div>
@@ -33,4 +33,4 @@ const page = () => {
   );
 };
 
-export default page;
+export default Page;

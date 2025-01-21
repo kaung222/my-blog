@@ -81,7 +81,7 @@ export async function createPost(
 /**
  * Remove a post by ID
  */
-export async function removePost(postId: number): Promise<any> {
+export async function removePost(postId: number) {
   await prisma.post.delete({ where: { id: postId } });
   return redirect("/dashboard/posts");
 }

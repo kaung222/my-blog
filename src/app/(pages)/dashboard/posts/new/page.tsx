@@ -3,7 +3,6 @@
 import { createPost } from "@/api/post";
 import Link from "next/link";
 import { useActionState } from "react";
-import { useFormState } from "react-dom";
 
 const Page = () => {
   const [state, action] = useActionState(createPost, undefined);

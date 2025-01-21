@@ -2,7 +2,6 @@
 import { login } from "@/api/auth";
 import Link from "next/link";
 import { useActionState } from "react";
-import { useFormState, useFormStatus } from "react-dom";
 
 export default function LoginForm() {
   const [state, action] = useActionState(login, undefined);
@@ -43,18 +42,18 @@ export default function LoginForm() {
         {state?.message && (
           <p className="text-sm text-red-500">{state.message}</p>
         )}
-        <LoginButton />
+        <button>Login</button>
       </div>
     </form>
   );
 }
 
-export function LoginButton() {
-  const { pending } = useFormStatus();
+// export function LoginButton() {
+//   const { pending } = useFormStatus();
 
-  return (
-    <button aria-disabled={pending} type="submit" className="mt-4 w-full">
-      {pending ? "Submitting..." : "Sign up"}
-    </button>
-  );
-}
+//   return (
+//     <button aria-disabled={pending} type="submit" className="mt-4 w-full">
+//       {pending ? "Submitting..." : "Sign up"}
+//     </button>
+//   );
+// }

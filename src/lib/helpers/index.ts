@@ -33,7 +33,8 @@ export async function decrypt(session: string | undefined = "") {
     });
     return payload;
   } catch (error) {
-    return null;
+    console.log(error);
+    return;
   }
 }
 
