@@ -3,19 +3,19 @@ import prisma from "@/lib/prisma";
 
 const getPosts = unstable_cache(
   async () => {
-    return await prisma.post.findMany();
+    return await prisma.post.findMany({ take: 20 });
   },
-  ["posts"],
-  { revalidate: 3600, tags: ["posts"] }
+  ["GetPosts"],
+  { revalidate: 3600, tags: ["GetPosts"] }
 );
 
 export default async function Page() {
-  const allPosts = await getPosts();
-
+  const posts = await getPosts();
+  console.log(posts);
   return (
     <ul>
       this is blog list
-      {allPosts.map((post) => (
+      {posts.map((post) => (
         <li key={post.id}>{post.title}</li>
       ))}
     </ul>

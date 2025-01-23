@@ -8,7 +8,10 @@ async function getPost(id: string) {
 }
 
 export async function generateStaticParams() {
-  const posts = await prisma.post.findMany({ orderBy: { createdAt: "desc" } });
+  const posts = await prisma.post.findMany({
+    orderBy: { views: "desc" },
+    take: 20,
+  });
   return posts.map((post) => ({
     id: String(post.id),
   }));
@@ -22,7 +25,7 @@ export async function generateMetadata({
   const { postId } = await params;
   const post = await getPost(postId);
   return {
-    title: post.title,
+    title: post.slug,
   };
 }
 

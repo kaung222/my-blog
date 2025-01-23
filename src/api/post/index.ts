@@ -4,6 +4,7 @@ import { CreatePostSchema, FormState, UpdatePostSchema } from "./definations";
 import { verifySession } from "@/lib/helpers";
 import slugify from "slugify";
 import { redirect } from "next/navigation";
+import { revalidateTag } from "next/cache";
 
 /**
  * Helper function to truncate content safely
@@ -72,9 +73,11 @@ export async function createPost(
     description: finalMetaDescription,
   });
 
-  await prisma.post.create({
+  const post = await prisma.post.create({
     data: { slug, thumbnail, userId, metadata, title, content },
   });
+  console.log(post);
+  revalidateTag("GetPosts");
   return redirect("/dashboard/posts");
 }
 
@@ -82,7 +85,9 @@ export async function createPost(
  * Remove a post by ID
  */
 export async function removePost(postId: number) {
+  console.log(postId);
   await prisma.post.delete({ where: { id: postId } });
+  revalidateTag("GetPosts");
   return redirect("/dashboard/posts");
 }
 

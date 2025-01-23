@@ -8,7 +8,7 @@ export async function middleware(request: NextRequest) {
   // Get the Authorization header
   const cookie = (await cookies()).get("session")?.value;
   const session = await decrypt(cookie);
-
+  //   console.log(session);
   if (!session) {
     return NextResponse.redirect(new URL("/login", request.url));
   }

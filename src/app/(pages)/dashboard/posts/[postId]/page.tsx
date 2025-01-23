@@ -23,7 +23,7 @@ export async function generateMetadata({
   const { postId } = await params;
   const post = await getPost(postId);
   return {
-    title: post.title,
+    title: post.slug,
   };
 }
 

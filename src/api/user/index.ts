@@ -3,6 +3,7 @@ import { hashPassword } from "@/lib/helpers";
 import prisma from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import { FormState, UserSchema } from "./definations";
+import { revalidateTag } from "next/cache";
 
 export async function createUser(
   formState: FormState,
@@ -35,10 +36,12 @@ export async function createUser(
   await prisma.user.create({
     data: { email, password: hash, name },
   });
+  revalidateTag("GetUsers");
   return redirect("/dashboard/users");
 }
 
 export async function deleteUser(userId: number) {
   await prisma.user.delete({ where: { id: userId } });
+  revalidateTag("GetUsers");
   return redirect("/dashboard/users");
 }

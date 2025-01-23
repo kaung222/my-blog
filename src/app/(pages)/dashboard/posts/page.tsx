@@ -1,13 +1,17 @@
 import DeletePost from "@/components/delete-post";
 import prisma from "@/lib/prisma";
+import { unstable_cache } from "next/cache";
 import Link from "next/link";
 
-const getPosts = async () => {
-  const posts = await prisma.post.findMany();
-  return posts;
-};
+const getCachedPosts = unstable_cache(
+  async () => await prisma.post.findMany({ take: 20 }),
+
+  ["my-posts"],
+  { revalidate: 5 * 60, tags: ["GetPosts"] }
+);
+
 const Page = async () => {
-  const posts = await getPosts();
+  const posts = await getCachedPosts();
   console.log(posts);
 
   return (

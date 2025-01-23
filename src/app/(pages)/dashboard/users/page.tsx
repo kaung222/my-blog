@@ -1,9 +1,18 @@
 import DeleteUser from "@/components/delete-user";
 import prisma from "@/lib/prisma";
+import { unstable_cache } from "next/cache";
 import Link from "next/link";
 
+const getCachedUsers = unstable_cache(
+  async () => await prisma.user.findMany(),
+  [],
+  {
+    revalidate: 3600,
+    tags: ["GetUsers"],
+  }
+);
 export default async function Page() {
-  const users = await prisma.user.findMany();
+  const users = await getCachedUsers();
   return (
     <div className="">
       <h3>Dashboad / Users </h3>
