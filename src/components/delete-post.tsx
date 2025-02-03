@@ -1,16 +1,18 @@
 "use client";
 
 import { removePost } from "@/api/post";
+import { Button } from "./ui/button";
 
 const DeletePost = ({ postId }: { postId: number }) => {
   return (
     <div>
-      <button
+      <Button
+        variant={"destructive"}
         onClick={() => removePost(postId)}
-        className=" p-5 rounded-md bg-blue-600"
+        className=""
       >
-        delete post
-      </button>
+        Delete
+      </Button>
     </div>
   );
 };
