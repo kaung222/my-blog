@@ -4,8 +4,12 @@ import { unstable_cache } from "next/cache";
 import Link from "next/link";
 
 const getCachedPosts = unstable_cache(
-  async () => await prisma.post.findMany({ take: 20 }),
-
+  async () =>
+    await prisma.post.findMany({
+      take: 20,
+      include: { user: true, category: true },
+      orderBy: { createdAt: "desc" },
+    }),
   ["my-posts"],
   { revalidate: 5 * 60, tags: ["GetPosts"] }
 );

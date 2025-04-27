@@ -1,5 +1,6 @@
 import { BlogCard } from "@/components/blog-card";
 import prisma from "@/lib/prisma";
+import { Metadata } from "next";
 import { notFound } from "next/navigation";
 
 async function getPost(slug: string) {
@@ -13,7 +14,10 @@ async function getPost(slug: string) {
 }
 
 export async function generateStaticParams() {
-  const posts = await prisma.post.findMany({ orderBy: { createdAt: "desc" } });
+  const posts = await prisma.post.findMany({
+    orderBy: { createdAt: "desc" },
+    take: 20,
+  });
   return posts.map((post) => ({
     id: String(post.slug),
   }));
@@ -26,9 +30,8 @@ export async function generateMetadata({
 }) {
   const { slug } = await params;
   const post = await getPost(slug);
-  const metadata: { title: string; description: string } = JSON.parse(
-    post.metadata as string
-  );
+  const metadata: Metadata = JSON.parse(post.metadata as string);
+
   return {
     title: metadata.title,
     description: metadata.description,

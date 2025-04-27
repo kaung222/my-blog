@@ -7,6 +7,7 @@ const getPosts = unstable_cache(
   async () => {
     return await prisma.post.findMany({
       take: 20,
+      orderBy: { createdAt: "desc" },
       include: { user: true, category: true },
     });
   },

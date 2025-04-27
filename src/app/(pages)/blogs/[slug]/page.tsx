@@ -1,20 +1,22 @@
 import { BlogCard } from "@/components/blog-card";
 import prisma from "@/lib/prisma";
 import { Post } from "@prisma/client";
+import { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { cache } from "react";
 
-async function getPost(slug: string) {
+const getPost = cache(async (slug: string) => {
   const post = await prisma.post.findUnique({
     where: { slug },
     include: { category: true, user: true },
   });
   if (!post) notFound();
   return post;
-}
+});
 
-async function getRelatedPosts(post: Post) {
+const getRelatedPosts = cache(async (post: Post) => {
   const posts = await prisma.post.findMany({
     where: {
       categoryId: post.categoryId,
@@ -24,7 +26,7 @@ async function getRelatedPosts(post: Post) {
     include: { user: true, category: true },
   });
   return posts;
-}
+});
 
 export async function generateStaticParams() {
   const posts = await prisma.post.findMany({
@@ -32,7 +34,7 @@ export async function generateStaticParams() {
     take: 20,
   });
   return posts.map((post) => ({
-    id: String(post.slug),
+    slug: post.slug,
   }));
 }
 
@@ -40,11 +42,14 @@ export async function generateMetadata({
   params,
 }: {
   params: Promise<{ slug: string }>;
-}) {
+}): Promise<Metadata> {
   const { slug } = await params;
   const post = await getPost(slug);
+  const metadata: Metadata = JSON.parse(post.metadata as string);
+
   return {
-    title: post.slug,
+    title: metadata.title,
+    description: metadata.description,
   };
 }
 
@@ -108,7 +113,7 @@ export default async function Page({
             <Link
               href={`/blogs/${post.slug}`}
               key={post.id}
-              className=" sm:w-full md:w-[300px] lg:w-[400px bg-red-600"
+              className=" sm:w-full md:w-[300px] lg:w-[400px bg-red-600]"
             >
               <BlogCard post={post} />
             </Link>
