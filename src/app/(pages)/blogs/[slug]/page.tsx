@@ -6,6 +6,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { cache } from "react";
+import BlogDetails from "./BlogDetails";
 
 const getPost = cache(async (slug: string) => {
   const post = await prisma.post.findUnique({
@@ -63,63 +64,8 @@ export default async function Page({
 
   const relatedPosts = await getRelatedPosts(post);
   return (
-    <article className="bg-white shadow overflow-hidden sm:rounded-lg">
-      <div className="relative">
-        <Image
-          src={post?.thumbnail || "/placeholder.jpg"}
-          alt={post.title}
-          width={1200}
-          height={600}
-          className="w-full h-64 object-cover sm:h-80 md:h-96"
-        />
-        <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-          <h1 className="text-3xl md:text-4xl font-bold text-white text-center px-4">
-            {post.title}
-          </h1>
-        </div>
-      </div>
-      <div className="px-4 py-5 sm:px-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <p className="text-sm font-medium text-gray-500">
-              Published on{" "}
-              {new Date(
-                post?.publishedAt || post.createdAt
-              ).toLocaleDateString()}
-            </p>
-            <p className="text-sm font-medium text-gray-500">
-              By {post.user.name}
-            </p>
-          </div>
-          <div className="text-sm text-gray-500">{post.views} views</div>
-        </div>
-        <div className="mt-4">
-          {/* {post.metadata.tags.map((tag) => (
-            <span
-              key={tag}
-              className="inline-block bg-gray-200 rounded-full px-3 py-1 text-sm font-semibold text-gray-700 mr-2 mb-2"
-            >
-              #{tag}
-            </span>
-          ))} */}
-        </div>
-      </div>
-      <div className="px-4 py-5 sm:p-6">
-        <p className="text-gray-700 whitespace-pre-wrap">{post.content}</p>
-      </div>
-      <div className="px-4 py-4 sm:px-6">
-        {relatedPosts.map((post) => {
-          return (
-            <Link
-              href={`/blogs/${post.slug}`}
-              key={post.id}
-              className=" sm:w-full md:w-[300px] lg:w-[400px bg-red-600]"
-            >
-              <BlogCard post={post} />
-            </Link>
-          );
-        })}
-      </div>
+    <article className="min-h-screen">
+      <BlogDetails post={post} />
     </article>
   );
 }

@@ -17,6 +17,7 @@ datasource db {
 model Post {
   id        Int      @id @default(autoincrement())
   title     String
+  excerpt   String  @default("sub-title")
   content   String
   thumbnail String?
   

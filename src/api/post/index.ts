@@ -38,10 +38,13 @@ export async function createPost(
 ): Promise<FormState> {
   const validatedFields = CreatePostSchema.safeParse({
     title: formData.get("title"),
-    content: formData.get("content"),
-    thumbnail: formData.get("thumbnail"),
+    excerpt: formData.get("excerpt"),
     metaTitle: formData.get("metaTitle"),
     metaDecription: formData.get("metaDecription"),
+    content: formData.get("content"),
+    published: formData.get("published") == "true",
+    categoryId: Number(formData.get("category")),
+    thumbnail: formData.get("thumbnail"),
   });
 
   const { userId } = await verifySession();
@@ -51,8 +54,15 @@ export async function createPost(
     };
   }
 
-  const { metaDecription, metaTitle, thumbnail, title, content } =
-    validatedFields.data;
+  const {
+    metaDecription,
+    metaTitle,
+    thumbnail,
+    title,
+    content,
+    excerpt,
+    published,
+  } = validatedFields.data;
 
   // Generate slug
   const truncatedTitle = title.slice(0, 50); // Truncate to 50 chars
@@ -74,11 +84,21 @@ export async function createPost(
   });
 
   const post = await prisma.post.create({
-    data: { slug, thumbnail, userId, metadata, title, content },
+    data: {
+      slug,
+      thumbnail,
+      userId,
+      metadata,
+      title,
+      content,
+      // excerpt,
+      published,
+    },
   });
   console.log(post);
   revalidateTag("GetPosts");
-  return redirect("/dashboard/posts");
+  // return redirect("/dashboard/posts");
+  return;
 }
 
 /**
