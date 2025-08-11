@@ -53,7 +53,7 @@ export default function Home() {
                   </Link>
                 </Button>
                 <Button variant="outline" asChild>
-                  <Link href="/contact">Contact</Link>
+                  <Link href="/contact-us">Contact</Link>
                 </Button>
               </div>
             </div>

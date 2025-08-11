@@ -12,9 +12,10 @@ import { Post } from "@/app/dashboard/posts/AdminPostsPage";
 
 type Props = {
   post: Post;
+  preview?: boolean;
 };
 
-const BlogDetails = ({ post }: Props) => {
+const BlogDetails = ({ post, preview = false }: Props) => {
   return (
     <>
       <div className="relative h-[60vh] min-h-[400px] w-full">
@@ -31,12 +32,14 @@ const BlogDetails = ({ post }: Props) => {
         <div className="absolute inset-0 bg-gradient-to-t from-background via-background/50 to-transparent" />
         <div className="absolute bottom-0 left-0 right-0">
           <div className="container px-4 py-12">
-            <Button variant="outline" size="sm" asChild className="mb-4">
-              <Link href="/blog">
-                <ArrowLeft className="mr-2 h-4 w-4" />
-                Back to Blog
-              </Link>
-            </Button>
+            {!preview && (
+              <Button variant="outline" size="sm" asChild className="mb-4">
+                <Link href="/blog">
+                  <ArrowLeft className="mr-2 h-4 w-4" />
+                  Back to Blog
+                </Link>
+              </Button>
+            )}
             <Badge className="mb-4">{post.category?.name}</Badge>
             <h1 className="text-4xl font-serif font-bold tracking-tight sm:text-5xl mb-4">
               {post.title}

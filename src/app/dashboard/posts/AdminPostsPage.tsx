@@ -49,6 +49,7 @@ import { format } from "date-fns";
 import DeletePost from "@/components/delete-post";
 import prisma from "@/lib/prisma";
 import { unstable_cache } from "next/cache";
+import PostPreview from "./PostPreview";
 
 export type Post = {
   category: {
@@ -68,7 +69,7 @@ export type Post = {
   slug: string;
   content: string;
   thumbnail: string | null;
-  excerpt: string;
+  excerpt: string | null;
   published: boolean;
   views: number;
   updatedAt: Date;
@@ -84,6 +85,7 @@ export default function AdminPostsPage({ posts }: Props) {
 
   const [selectedPosts, setSelectedPosts] = useState<string[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
+  const [previewPost, setPreviewPost] = useState<Post | null>(null);
 
   // Filter posts based on search query
   const filteredPosts = posts.filter(
@@ -197,6 +199,7 @@ export default function AdminPostsPage({ posts }: Props) {
                         post={post}
                         selectedPosts={selectedPosts}
                         togglePostSelection={togglePostSelection}
+                        setPreviewPost={setPreviewPost}
                       />
                     ))
                   ) : (
@@ -258,6 +261,7 @@ export default function AdminPostsPage({ posts }: Props) {
                         post={post}
                         selectedPosts={selectedPosts}
                         togglePostSelection={togglePostSelection}
+                        setPreviewPost={setPreviewPost}
                       />
                     ))}
                   {/* Published posts would be displayed here */}
@@ -298,6 +302,7 @@ export default function AdminPostsPage({ posts }: Props) {
                         post={post}
                         selectedPosts={selectedPosts}
                         togglePostSelection={togglePostSelection}
+                        setPreviewPost={setPreviewPost}
                       />
                     ))}
                   {/* Draft posts would be displayed here */}
@@ -315,169 +320,89 @@ const PostRow = ({
   post,
   selectedPosts,
   togglePostSelection,
+  setPreviewPost,
 }: {
   post: Post;
   selectedPosts: string[];
   togglePostSelection: (id: string) => void;
+  setPreviewPost: (post: Post | null) => void;
 }) => {
   const formatDate = (dateString: string | Date) => {
     return format(new Date(dateString), "MMM d, yyyy");
   };
   return (
-    <TableRow key={post.id}>
-      <TableCell>
-        <Checkbox
-          checked={selectedPosts.includes(post.id.toString())}
-          onCheckedChange={() => togglePostSelection(post.id.toString())}
-          aria-label={`Select post ${post.title}`}
-        />
-      </TableCell>
-      <TableCell>
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded bg-muted flex items-center justify-center">
-            <FileText className="h-4 w-4" />
-          </div>
-          <div>
-            <div className="font-medium">{post.title}</div>
-            <div className="hidden sm:inline text-sm text-muted-foreground line-clamp-1">
-              {post.excerpt}
+    <>
+      <TableRow key={post.id}>
+        <TableCell>
+          <Checkbox
+            checked={selectedPosts.includes(post.id.toString())}
+            onCheckedChange={() => togglePostSelection(post.id.toString())}
+            aria-label={`Select post ${post.title}`}
+          />
+        </TableCell>
+        <TableCell>
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 rounded bg-muted flex items-center justify-center">
+              <FileText className="h-4 w-4" />
+            </div>
+            <div>
+              <div className="font-medium">{post.title}</div>
+              <div className="hidden sm:inline text-sm text-muted-foreground line-clamp-1">
+                {post.excerpt}
+              </div>
             </div>
           </div>
-        </div>
-      </TableCell>
-      <TableCell className="hidden md:table-cell">
-        <Badge variant={post.published ? "default" : "secondary"}>
-          {post.published ? "Published" : "Draft"}
-        </Badge>
-      </TableCell>
-      <TableCell className="hidden lg:table-cell">
-        <div className="flex items-center">
-          <Calendar className="mr-2 h-4 w-4 text-muted-foreground" />
-          <span>{formatDate(post.createdAt)}</span>
-        </div>
-      </TableCell>
-      <TableCell className="hidden sm:table-cell">{post.views}</TableCell>
-      <TableCell className="text-right">
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon">
-              <MoreHorizontal className="h-4 w-4" />
-              <span className="sr-only">More options</span>
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuItem>
-              <Eye className="mr-2 h-4 w-4" />
-              View
-            </DropdownMenuItem>
-            <DropdownMenuItem>
-              <Edit className="mr-2 h-4 w-4" />
-              Edit
-            </DropdownMenuItem>
-            <DropdownMenuItem>
-              <Copy className="mr-2 h-4 w-4" />
-              Duplicate
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem className="text-destructive">
-              <Trash className="mr-2 h-4 w-4" />
-              Delete
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </TableCell>
-    </TableRow>
+        </TableCell>
+        <TableCell className="hidden md:table-cell">
+          <Badge variant={post.published ? "default" : "secondary"}>
+            {post.published ? "Published" : "Draft"}
+          </Badge>
+        </TableCell>
+        <TableCell className="hidden lg:table-cell">
+          <div className="flex items-center">
+            <Calendar className="mr-2 h-4 w-4 text-muted-foreground" />
+            <span>{formatDate(post.createdAt)}</span>
+          </div>
+        </TableCell>
+        <TableCell className="hidden sm:table-cell">{post.views}</TableCell>
+        <TableCell className="text-right">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="icon">
+                <MoreHorizontal className="h-4 w-4" />
+                <span className="sr-only">More options</span>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={(e) => e.preventDefault()}>
+                <PostPreview
+                  post={post}
+                  trigger={
+                    <Button variant={"ghost"} className=" px-0 py-0 h-6 ">
+                      <Eye className="mr-2 h-4 w-4" />
+                      View
+                    </Button>
+                  }
+                />
+              </DropdownMenuItem>
+
+              <DropdownMenuItem>
+                <Edit className="mr-2 h-4 w-4" />
+                Edit
+              </DropdownMenuItem>
+              <DropdownMenuItem>
+                <Copy className="mr-2 h-4 w-4" />
+                Duplicate
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem className="text-destructive">
+                <Trash className="mr-2 h-4 w-4" />
+                Delete
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </TableCell>
+      </TableRow>
+    </>
   );
 };
-
-// Mock data for posts
-const posts = [
-  {
-    id: "1",
-    title: "The Future of Artificial Intelligence in Everyday Life",
-    slug: "future-of-ai-in-everyday-life",
-    excerpt:
-      "Exploring how AI will transform our daily routines, from smart homes to healthcare and beyond.",
-    category: "Technology",
-    published: true,
-    createdAt: "2023-06-15T00:00:00.000Z",
-    views: 1240,
-  },
-  {
-    id: "2",
-    title: "Sustainable Travel: Exploring the World Responsibly",
-    slug: "sustainable-travel-exploring-world-responsibly",
-    excerpt:
-      "Tips and insights for minimizing your environmental impact while still enjoying meaningful travel experiences.",
-    category: "Travel",
-    published: true,
-    createdAt: "2023-08-22T00:00:00.000Z",
-    views: 894,
-  },
-  {
-    id: "3",
-    title: "The Science of Productivity: Work Smarter, Not Harder",
-    slug: "science-of-productivity",
-    excerpt:
-      "Research-backed strategies to enhance your workflow and achieve more with less stress.",
-    category: "Lifestyle",
-    published: true,
-    createdAt: "2023-09-10T00:00:00.000Z",
-    views: 1056,
-  },
-  {
-    id: "4",
-    title: "Modern Web Development: Trends to Watch in 2025",
-    slug: "web-development-trends-2025",
-    excerpt:
-      "Exploring the emerging technologies and methodologies shaping the future of web development.",
-    category: "Technology",
-    published: true,
-    createdAt: "2023-10-05T00:00:00.000Z",
-    views: 423,
-  },
-  {
-    id: "5",
-    title: "Hidden Gems: Undiscovered Travel Destinations",
-    slug: "hidden-gems-travel-destinations",
-    excerpt:
-      "Venture off the beaten path to these lesser-known but equally stunning locations around the world.",
-    category: "Travel",
-    published: true,
-    createdAt: "2023-10-12T00:00:00.000Z",
-    views: 315,
-  },
-  {
-    id: "6",
-    title: "Mindfulness in the Digital Age: Finding Balance",
-    slug: "mindfulness-digital-age",
-    excerpt:
-      "Practical approaches to maintaining mental wellness while navigating our technology-filled lives.",
-    category: "Lifestyle",
-    published: false,
-    createdAt: "2023-10-18T00:00:00.000Z",
-    views: 0,
-  },
-  {
-    id: "7",
-    title: "The Power of Habit: Transform Your Life",
-    slug: "power-of-habit",
-    excerpt:
-      "How small, consistent actions can lead to significant personal and professional growth over time.",
-    category: "Lifestyle",
-    published: true,
-    createdAt: "2023-05-05T00:00:00.000Z",
-    views: 1824,
-  },
-  {
-    id: "8",
-    title: "Mastering JavaScript: Essential Tips for Modern Development",
-    slug: "mastering-javascript",
-    excerpt:
-      "Key concepts and techniques to level up your JavaScript skills and write cleaner, more efficient code.",
-    category: "Technology",
-    published: false,
-    createdAt: "2023-04-18T00:00:00.000Z",
-    views: 0,
-  },
-];

@@ -65,7 +65,7 @@ export default async function Page({
   const relatedPosts = await getRelatedPosts(post);
   return (
     <article className="min-h-screen">
-      <BlogDetails post={post} />
+      <BlogDetails post={{ ...post, excerpt: post.excerpt || "" }} />
     </article>
   );
 }

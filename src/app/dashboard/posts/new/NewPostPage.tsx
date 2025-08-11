@@ -39,6 +39,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { CreatePostSchema } from "@/api/post/definations";
 import { z, ZodIssue } from "zod";
 import ZodErrorMessage from "@/components/ZodErrorMessage";
+import PostPreview from "../PostPreview";
+import { Post } from "../AdminPostsPage";
 
 type Props = {
   categories: {
@@ -129,6 +131,32 @@ export default function NewPostPage({ categories }: Props) {
     router.push("/dashboard/posts");
   };
 
+  const previewPost: Post = {
+    category: categories.find(
+      (category) => category.id === Number(category)
+    ) || {
+      name: "",
+      id: 0,
+      description: "",
+    },
+    user: {
+      name: "Jane Doe",
+      id: 1,
+      email: "jame@gmail.com",
+      password: "",
+    },
+    thumbnail: thumbnail,
+    title: title,
+    excerpt: excerpt,
+    content: content,
+    published: published,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+    slug: "",
+    id: 0,
+    views: 0,
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -142,10 +170,15 @@ export default function NewPostPage({ categories }: Props) {
           <Button variant="outline" onClick={handleCancel}>
             Cancel
           </Button>
-          <Button variant="outline">
-            <Eye className="mr-2 h-4 w-4" />
-            Preview
-          </Button>
+          <PostPreview
+            post={previewPost}
+            trigger={
+              <Button variant="outline">
+                <Eye className="mr-2 h-4 w-4" />
+                Preview
+              </Button>
+            }
+          />
           <Button onClick={handleSubmit} disabled={loading}>
             {loading ? (
               <>

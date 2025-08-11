@@ -82,18 +82,19 @@ export async function createPost(
     title: finalMetaTitle,
     description: finalMetaDescription,
   });
-
+  const data = {
+    slug,
+    thumbnail,
+    userId,
+    metadata,
+    title,
+    content,
+    excerpt,
+    published,
+  };
+  console.log(data, "post payload");
   const post = await prisma.post.create({
-    data: {
-      slug,
-      thumbnail,
-      userId,
-      metadata,
-      title,
-      content,
-      // excerpt,
-      published,
-    },
+    data,
   });
   console.log(post);
   revalidateTag("GetPosts");
